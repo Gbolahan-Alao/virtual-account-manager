@@ -1,4 +1,3 @@
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Pagination from '@mui/material/Pagination';
@@ -16,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 const UserPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(100); 
+  const [rowsPerPage] = useState(100);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,17 +26,21 @@ const UserPage = () => {
           throw new Error('Failed to fetch accounts');
         }
         const data = await response.json();
-        setAccounts(data.reverse()); // Reverse the order of accounts array
+        setAccounts(data.reverse());
       } catch (error) {
         console.error('Error fetching accounts:', error.message);
       }
     };
 
     fetchAccounts();
-  }, []); // Empty dependency array to fetch accounts only once when component mounts
+  }, []);
 
   const navigateToCreateAccount = () => {
     navigate('/create-account');
+  };
+
+  const navigateToTransactions = (accountNumber) => {
+    navigate(`/transactions/${accountNumber}`);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -56,36 +59,31 @@ const UserPage = () => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        position: 'relative', // Ensure button position is relative to this container
+        position: 'relative',
       }}
     >
-      <Box
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={navigateToCreateAccount}
         sx={{
           position: 'absolute',
           top: 20,
           right: 20,
+          boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+          '&:hover': {
+            boxShadow: '0 8px 16px 0 rgba(0,0,0,0.2)',
+          },
+          textTransform: 'none',
         }}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={navigateToCreateAccount}
-          sx={{
-            boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-            '&:hover': {
-              boxShadow: '0 8px 16px 0 rgba(0,0,0,0.2)',
-            },
-            textTransform: 'none',
-          }}
-        >
-          Create Account
-        </Button>
-      </Box>
+        Create Account
+      </Button>
       <Typography variant="h4" gutterBottom>
         Registered Accounts
       </Typography>
       <TableContainer
-        component={Box}
+        component="div"
         sx={{
           boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
           borderRadius: '12px',
@@ -104,7 +102,11 @@ const UserPage = () => {
           </TableHead>
           <TableBody>
             {currentAccounts.map((account, index) => (
-              <TableRow key={index}>
+              <TableRow
+                key={index}
+                onClick={() => navigateToTransactions(account.accountNumber)}
+                sx={{ cursor: 'pointer' }}
+              >
                 <TableCell>{account.accountName}</TableCell>
                 <TableCell>{account.accountNumber}</TableCell>
                 <TableCell>{new Date(account.createdOn).toLocaleString()}</TableCell>
@@ -116,18 +118,18 @@ const UserPage = () => {
       </TableContainer>
       <Stack sx={{ my: 3 }}>
         <Pagination
-          count={Math.ceil(accounts.length / rowsPerPage)} // Calculate total number of pages
+          count={Math.ceil(accounts.length / rowsPerPage)}
           page={page}
           onChange={handleChangePage}
           color="primary"
           shape="rounded"
           sx={{
             '& .MuiPaginationItem-root': {
-              borderRadius: '8px', // Adjust border radius for pagination items
+              borderRadius: '8px',
             },
             '& .Mui-selected': {
-              backgroundColor: '#1976d2', // Change background color for selected page
-              color: '#fff', // Change text color for selected page
+              backgroundColor: '#1976d2',
+              color: '#fff',
             },
           }}
         />

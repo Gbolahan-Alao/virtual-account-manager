@@ -8,6 +8,7 @@ export const BlogPage = lazy(() => import('src/pages/blog'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const CreateAccountPage = lazy(()=> import('src/pages/create-account'));
+export const FindTransactionsPage = lazy(()=> import('src/pages/find-transaction'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const AppPage = lazy(() => import('src/pages/app'));
@@ -32,6 +33,7 @@ export default function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'create-account', element: <CreateAccountPage /> },
+         { path: 'transactions/:accountNumber', element: <FindTransactionsPage /> },
       ],
     },
     {
