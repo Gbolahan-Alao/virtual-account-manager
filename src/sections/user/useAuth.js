@@ -10,6 +10,7 @@ export const useAuth = () => {
   const login = (token) => {
     localStorage.setItem('token', token);
     setUser(token);
+    console.log(token)
   };
 
   const logout = () => {

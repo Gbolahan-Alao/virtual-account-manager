@@ -34,7 +34,8 @@ export default function LoginView() {
       });
 
       if (response.data.token) {
-        auth.login(response.data.token); // Store the token
+        auth.login(response.data.token); 
+        console.log(response.data.to)// Store the token
         router.push('/app');
       }
     } catch (loginError) { // Rename the error variable to avoid shadowing
