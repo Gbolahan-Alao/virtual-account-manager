@@ -1,3 +1,4 @@
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import SvgColor from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
@@ -21,6 +22,11 @@ const navConfig = [
     title: 'transactions',
     path: '/products',
     icon: icon('ic_cart'),
+  },
+  {
+    title: 'settings',
+    path: '/settings',
+    icon: <SettingsSuggestIcon/>
   }
  
 ];

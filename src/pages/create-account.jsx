@@ -4,12 +4,18 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Iconify from 'src/components/iconify';
 
 const CreateAccountPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  // Disable ESLint rule for undefined variable
+  // eslint-disable-next-line no-undef
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   const handleFirstNameChange = (event) => {
     setFirstName(event.target.value);
@@ -17,6 +23,10 @@ const CreateAccountPage = () => {
 
   const handleLastNameChange = (event) => {
     setLastName(event.target.value);
+  };
+
+  const handlePhoneNumberChange = (event) => {
+    setPhoneNumber(event.target.value);
   };
 
   const handleGenerateAccount = async () => {
@@ -30,22 +40,32 @@ const CreateAccountPage = () => {
         },
         body: JSON.stringify({
           firstName,
-          lastName,  
+          lastName,
+          phoneNumber,
         }),
       });
+
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to generate virtual account');
+        throw new Error(responseData.virtualAccountName || 'Failed to generate virtual account');
       }
 
-     
+      if (responseData && responseData.virtualAccountName === "Phone number already exists. Account cannot be created.") {
+        setError('Phone number already exists. Account cannot be created.');
+        return;
+      }
+
       alert(`Account created successfully. Account Name: ${lastName} ${firstName}`);
-    } catch (error) {
-      console.error('Error generating virtual account:', error.message);
-      alert('Failed to generate virtual account. Please try again later.');
+      navigate('/app'); // Use navigate instead of history.push
+    } catch (fetchError) {
+      console.error('Error generating virtual account:', fetchError.message);
+      setError('Failed to generate virtual account. Please try again later.');
     } finally {
       setLoading(false);
-      setFirstName("");
-      setLastName("");
+      setFirstName('');
+      setLastName('');
+      setPhoneNumber('');
     }
   };
 
@@ -56,7 +76,6 @@ const CreateAccountPage = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center'
-       
       }}
     >
       <Stack direction="column" spacing={4} mb={5} sx={{ width: '40%' }}>
@@ -79,6 +98,17 @@ const CreateAccountPage = () => {
           onChange={handleLastNameChange}
           fullWidth
         />
+
+        <TextField
+          id="phoneNumber"
+          label="Phone Number"
+          variant="outlined"
+          value={phoneNumber}
+          onChange={handlePhoneNumberChange}
+          fullWidth
+        />
+
+        {error && <Typography color="error">{error}</Typography>}
 
         <Button
           variant="contained"
