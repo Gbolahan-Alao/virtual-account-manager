@@ -100,6 +100,8 @@ const UserPage = () => {
                     <TableCell>Account Name</TableCell>
                     <TableCell>Account Number</TableCell>
                     <TableCell>Mobile Number</TableCell>
+                    <TableCell>Branch</TableCell>
+                    <TableCell>Nickname</TableCell>
                     <TableCell>Reference</TableCell>
                   </TableRow>
                 </TableHead>
@@ -114,6 +116,8 @@ const UserPage = () => {
                       <TableCell>{account.accountName}</TableCell>
                       <TableCell>{account.accountNumber}</TableCell>
                       <TableCell>{account.phoneNumber}</TableCell>
+                      <TableCell>{account.branch}</TableCell>
+                      <TableCell>{account.nickName}</TableCell>
                       <TableCell>{account.reference}</TableCell>
                     </TableRow>
                   ))}
