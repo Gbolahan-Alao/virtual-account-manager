@@ -12,39 +12,78 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const UserPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(50);
   const [openErrorModal, setOpenErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [searchWord, setSearchWord] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchAccounts = async () => {
+  // Use a local cache to store fetched accounts
+  const [cachedAccounts, setCachedAccounts] = useState({});
+
+  // Function to fetch accounts with caching
+  const fetchAccounts = useCallback(
+    async (searchTerm) => {
       try {
-        const response = await fetch('https://localhost:7205/virtualaccount/created-accounts');
+        // Check if data for the current search term exists in the cache
+        if (cachedAccounts[searchTerm]) {
+          setAccounts(cachedAccounts[searchTerm]); // Use cached data
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true);
+        let endpoint = `https://localhost:7205/virtualaccount/created-accounts`;
+        if (searchTerm.trim() !== '') {
+          endpoint = `https://localhost:7205/VirtualAccount/find-account?searchWord=${searchTerm}`;
+        }
+        const response = await fetch(endpoint);
         if (!response.ok) {
-          throw new Error('Failed to fetch accounts');
+          throw new Error('Failed to search accounts');
         }
         const data = await response.json();
+
+        // Update the cache with fetched data
+        setCachedAccounts((prevState) => ({
+          ...prevState,
+          [searchTerm]: data,
+        }));
+
         setAccounts(data);
         setLoading(false);
-      } catch (fetchError) {
-        console.error('Error fetching accounts:', fetchError.message);
+      } catch (error) {
+        console.error('Error fetching accounts:', error.message);
         setLoading(false);
         setOpenErrorModal(true);
         setErrorMessage('Failed to fetch accounts. Please try again later.');
       }
-    };
+    },
+    [cachedAccounts]
+  );
 
-    fetchAccounts();
-  }, []);
+  // Modify the handleChangeSearch function to use the fetchAccounts function with caching
+  const handleChangeSearch = (e) => {
+    const searchValue = e.target.value;
+    setSearchWord(searchValue);
+    fetchAccounts(searchValue); // Use cached data if available
+  };
+
+  useEffect(() => {
+    fetchAccounts('');
+  }, [fetchAccounts]); // Include fetchAccounts in the dependency array
+
+  useEffect(() => {
+    fetchAccounts(searchWord);
+  }, [searchWord, fetchAccounts]); // Include fetchAccounts in the dependency array
 
   const navigateToCreateAccount = () => {
     navigate('/create-account');
@@ -71,18 +110,33 @@ const UserPage = () => {
         alignItems: 'center',
         height: '100vh',
         position: 'relative',
-        paddingTop: '0', // Add padding top to align content from the top
+        paddingTop: '0',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '1rem' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          marginBottom: '1rem',
+        }}
+      >
         <Typography variant="h4" sx={{ alignSelf: 'flex-start', flexGrow: 1, marginTop: 0 }}>
           Registered Accounts
         </Typography>
+        <TextField
+          label="Search"
+          variant="outlined"
+          size="small"
+          value={searchWord}
+          onChange={handleChangeSearch}
+          sx={{ marginRight: '1rem' }}
+        />
         <Button
           variant="contained"
           color="primary"
           onClick={navigateToCreateAccount}
-          sx={{ textTransform: 'none' }}
+          sx={{ textTransform: 'none', marginLeft: '1rem' }}
         >
           Create Account
         </Button>
@@ -91,18 +145,17 @@ const UserPage = () => {
         <CircularProgress />
       ) : (
         <>
-          <Paper sx={{ height: 400, overflow: 'auto', marginBottom: '1rem', width: '100%' }}>
+          <Paper sx={{ height: 500, overflow: 'auto', marginBottom: '1rem', width: '100%' }}>
             <TableContainer>
               <Table sx={{ minWidth: 650 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Created On</TableCell>
-                    <TableCell>Account Name</TableCell>
-                    <TableCell>Account Number</TableCell>
-                    <TableCell>Mobile Number</TableCell>
                     <TableCell>Branch</TableCell>
+                    <TableCell>Account Name</TableCell>
                     <TableCell>Nickname</TableCell>
-                    <TableCell>Reference</TableCell>
+                    <TableCell>Account Number</TableCell>
+                    <TableCell>Phone Number</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -113,12 +166,11 @@ const UserPage = () => {
                       sx={{ cursor: 'pointer' }}
                     >
                       <TableCell>{new Date(account.createdOn).toLocaleString()}</TableCell>
+                      <TableCell>{account.branch}</TableCell>
                       <TableCell>{account.accountName}</TableCell>
+                      <TableCell>{account.nickName}</TableCell>
                       <TableCell>{account.accountNumber}</TableCell>
                       <TableCell>{account.phoneNumber}</TableCell>
-                      <TableCell>{account.branch}</TableCell>
-                      <TableCell>{account.nickName}</TableCell>
-                      <TableCell>{account.reference}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
