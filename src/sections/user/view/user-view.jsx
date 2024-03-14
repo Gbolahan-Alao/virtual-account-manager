@@ -27,16 +27,12 @@ const UserPage = () => {
   const [searchWord, setSearchWord] = useState('');
   const navigate = useNavigate();
 
-  // Use a local cache to store fetched accounts
   const [cachedAccounts, setCachedAccounts] = useState({});
-
-  // Function to fetch accounts with caching
   const fetchAccounts = useCallback(
     async (searchTerm) => {
       try {
-        // Check if data for the current search term exists in the cache
         if (cachedAccounts[searchTerm]) {
-          setAccounts(cachedAccounts[searchTerm]); // Use cached data
+          setAccounts(cachedAccounts[searchTerm]); 
           setLoading(false);
           return;
         }
@@ -51,8 +47,6 @@ const UserPage = () => {
           throw new Error('Failed to search accounts');
         }
         const data = await response.json();
-
-        // Update the cache with fetched data
         setCachedAccounts((prevState) => ({
           ...prevState,
           [searchTerm]: data,
@@ -70,20 +64,19 @@ const UserPage = () => {
     [cachedAccounts]
   );
 
-  // Modify the handleChangeSearch function to use the fetchAccounts function with caching
   const handleChangeSearch = (e) => {
     const searchValue = e.target.value;
     setSearchWord(searchValue);
-    fetchAccounts(searchValue); // Use cached data if available
+    fetchAccounts(searchValue); 
   };
 
   useEffect(() => {
     fetchAccounts('');
-  }, [fetchAccounts]); // Include fetchAccounts in the dependency array
+  }, [fetchAccounts]); 
 
   useEffect(() => {
     fetchAccounts(searchWord);
-  }, [searchWord, fetchAccounts]); // Include fetchAccounts in the dependency array
+  }, [searchWord, fetchAccounts]); 
 
   const navigateToCreateAccount = () => {
     navigate('/create-account');
@@ -151,11 +144,11 @@ const UserPage = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Created On</TableCell>
-                    <TableCell>Branch</TableCell>
                     <TableCell>Account Name</TableCell>
-                    <TableCell>Nickname</TableCell>
+                    <TableCell>Branch</TableCell>
                     <TableCell>Account Number</TableCell>
                     <TableCell>Phone Number</TableCell>
+                    <TableCell>Nickname</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -166,11 +159,11 @@ const UserPage = () => {
                       sx={{ cursor: 'pointer' }}
                     >
                       <TableCell>{new Date(account.createdOn).toLocaleString()}</TableCell>
-                      <TableCell>{account.branch}</TableCell>
                       <TableCell>{account.accountName}</TableCell>
-                      <TableCell>{account.nickName}</TableCell>
+                      <TableCell>{account.branch}</TableCell>
                       <TableCell>{account.accountNumber}</TableCell>
                       <TableCell>{account.phoneNumber}</TableCell>
+                       <TableCell>{account.nickName}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

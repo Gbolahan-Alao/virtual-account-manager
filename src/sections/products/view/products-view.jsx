@@ -1,4 +1,4 @@
-import SearchIcon from '@mui/icons-material/Search';
+import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import InputBase from '@mui/material/InputBase';
@@ -11,11 +11,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import JsPDF from 'jspdf';
 import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import * as XLSX from 'xlsx';
+import './custom-datepicker.css';
 
 export default function TransactionsView() {
   const [notifications, setNotifications] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openErrorModal, setOpenErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -45,31 +51,110 @@ export default function TransactionsView() {
     setSearchQuery(event.target.value);
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const options = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const filteredNotifications = notifications.filter((notification) =>
-  notification.transactionReference.toLowerCase().includes(searchQuery) ||
-  notification.accountNumber.toLowerCase().includes(searchQuery)
-);
+  const filteredNotifications = notifications.filter(
+    (notification) =>
+      notification.transactionReference.toLowerCase().includes(searchQuery) ||
+      notification.accountNumber.includes(searchQuery) ||
+      notification.virtualAccountName.toLowerCase().includes(searchQuery)
+  );
 
+  const filteredNotificationsByDate = selectedDate
+    ? filteredNotifications.filter(
+        (notification) =>
+          new Date(notification.transactionDate).toDateString() === selectedDate.toDateString()
+      )
+    : filteredNotifications;
+
+  const exportToExcel = () => {
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(filteredNotificationsByDate);
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Notifications');
+
+    XLSX.writeFile(workbook, 'notifications.xlsx');
+  };
+
+  const exportToPdf = () => {
+    const doc = new JsPDF();
+
+    doc.text('Notifications', 10, 10);
+
+    let y = 20;
+    filteredNotificationsByDate.forEach((notification) => {
+      doc.text(`Transaction Date: ${formatDate(notification.transactionDate)}`, 10, y);
+      doc.text(`Account Number: ${notification.accountNumber}`, 10, y + 10);
+
+      y += 20;
+    });
+
+    doc.save('notifications.pdf');
+  };
 
   return (
     <Container>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" sx={{ mb: 5 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
+        <Typography variant="h4" component="h1">
           Account Transactions
         </Typography>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <SearchIcon style={{ marginRight: 8 }} />
           <InputBase
             placeholder="Find transactions"
             value={searchQuery}
             onChange={handleSearchChange}
-            style={{ borderRadius: 8, backgroundColor: '#f3f3f3', padding: '6px 12px' }}
+            style={{
+              borderRadius: 8,
+              backgroundColor: '#f3f3f3',
+              padding: '6px 12px',
+              marginRight: '16px',
+            }}
           />
+          <div style={{}}>
+            <DatePicker
+              id="datepicker"
+              selected={selectedDate}
+              onChange={handleDateChange}
+              dateFormat="MM/dd/yyyy"
+              placeholderText="Select date"
+              wrapperClassName="datepicker-wrapper"
+              className="datepicker-input"
+              style={{
+                borderRadius: 8,
+                backgroundColor: '#f3f3f3',
+                padding: '6px 12px',
+                paddingRight: '3px',
+              }}
+            />
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Button variant="outlined" onClick={exportToExcel} style={{ marginRight: 10 }}>
+            Export to Excel
+          </Button>
+          <Button variant="outlined" onClick={exportToPdf}>
+            Export to PDF
+          </Button>
         </div>
       </div>
 
@@ -80,27 +165,64 @@ export default function TransactionsView() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><Typography variant="subtitle2">Transaction Date</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Account Number</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Account Name</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Amount</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Sender Account Number</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Sender Account Name</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Sender Bank Name</Typography></TableCell>
-                <TableCell><Typography variant="subtitle2">Transaction Reference</Typography></TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Transaction Date</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Account Number</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Account Name</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Amount</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Sender Account Number</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Sender Account Name</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Sender Bank Name</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle3">Transaction Reference</Typography>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredNotifications.map((notification) => (
-                <TableRow key={notification.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell><Typography variant="caption">{formatDate(notification.transactionDate)}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.accountNumber}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.virtualAccountName}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.amount}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.senderAccountNumber}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.senderAccountName}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.senderBankName}</Typography></TableCell>
-                  <TableCell><Typography variant="caption">{notification.transactionReference}</Typography></TableCell>
+              {filteredNotificationsByDate.map((notification) => (
+                <TableRow
+                  key={notification.id}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell>
+                    <Typography variant="caption">
+                      {formatDate(notification.transactionDate)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.accountNumber}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.virtualAccountName}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.amount}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.senderAccountNumber}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.senderAccountName}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.senderBankName}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="caption">{notification.transactionReference}</Typography>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -115,7 +237,7 @@ export default function TransactionsView() {
         aria-describedby="modal-modal-description"
         sx={{
           '& .MuiModal-root': {
-            zIndex: 'modal', // Ensures the modal has the correct z-index
+            zIndex: 'modal',
           },
         }}
       >

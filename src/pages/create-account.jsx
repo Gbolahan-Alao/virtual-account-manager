@@ -155,8 +155,8 @@ const CreateAccountPage = () => {
            MenuProps={{
              PaperProps: {
                sx: {
-                 maxHeight: '250px', // Increase the maximum height here
-                 width: 'auto', // Adjust the width as needed
+                 maxHeight: '250px', 
+                 width: 'auto',
                },
              },
            }}
