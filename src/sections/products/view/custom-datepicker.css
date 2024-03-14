@@ -1,19 +1,22 @@
 
 .datepicker-wrapper {
     display: inline-block;
-    width: 10px;
+    width: auto; /* Updated to automatically adjust width */
   }
+  
   .datepicker-input {
-    border: 1px solid #ccc;
+    border: 1px solid blue; /* Updated to blue outline */
     border-radius: 8px;
     background-color: #f3f3f3;
-    padding: 6px 12px;
+    padding: 8px 12px; /* Adjusted padding for height */
     font-size: 14px;
-    color: #333;
-    width:6rem;
+    color: blue; /* Updated to blue text color */
+    width: auto;
     margin-right: 10px;
+    height: 40px; /* Adjusted height to match buttons */
   }
-
+  
+   
   .react-datepicker-popper {
     border: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

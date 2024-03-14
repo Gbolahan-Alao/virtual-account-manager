@@ -1,3 +1,7 @@
+import EventIcon from '@mui/icons-material/Event';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
@@ -107,55 +111,52 @@ export default function TransactionsView() {
 
   return (
     <Container>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 20,
-        }}
-      >
-        <Typography variant="h4" component="h1">
-          Account Transactions
-        </Typography>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <InputBase
-            placeholder="Find transactions"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{
-              borderRadius: 8,
-              backgroundColor: '#f3f3f3',
-              padding: '6px 12px',
-              marginRight: '16px',
-            }}
-          />
-          <div style={{}}>
-            <DatePicker
-              id="datepicker"
-              selected={selectedDate}
-              onChange={handleDateChange}
-              dateFormat="MM/dd/yyyy"
-              placeholderText="Select date"
-              wrapperClassName="datepicker-wrapper"
-              className="datepicker-input"
-              style={{
-                borderRadius: 8,
-                backgroundColor: '#f3f3f3',
-                padding: '6px 12px',
-                paddingRight: '3px',
-              }}
-            />
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Button variant="outlined" onClick={exportToExcel} style={{ marginRight: 10 }}>
-            Export to Excel
-          </Button>
-          <Button variant="outlined" onClick={exportToPdf}>
-            Export to PDF
-          </Button>
-        </div>
+      <Typography variant="h4" component="h1" style={{ color: 'blue', marginBottom: 20 }}>
+        Account Transactions
+      </Typography>
+
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+        <InputBase
+          placeholder="Find transactions"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          startAdornment={<SearchIcon />}
+          style={{
+            height: '40px',
+            borderRadius: 8,
+            backgroundColor: '#f3f3f3',
+            padding: '6px 12px',
+            marginRight: '16px',
+            color: 'blue',
+            border: '1px solid blue',
+          }}
+        />
+        <DatePicker
+          id="datepicker"
+          selected={selectedDate}
+          onChange={handleDateChange}
+          dateFormat="MM/dd/yyyy"
+          placeholderText="Select date"
+          wrapperClassName="datepicker-wrapper"
+          className="datepicker-input"
+          customInput={<InputBase startAdornment={<EventIcon />} />}
+          style={{
+            borderRadius: 8,
+            backgroundColor: '#f3f3f3',
+            padding: '6px 12px',
+            paddingRight: '3px',
+            height: '40px',
+            width: '200px',
+            color: 'blue',
+            border: '1px solid blue',
+          }}
+        />
+        <Button variant="outlined" onClick={exportToExcel} startIcon={<SaveAltIcon />} style={{ color: 'blue', borderColor: 'blue', marginRight: 10 }}>
+          Excel
+        </Button>
+        <Button variant="outlined" onClick={exportToPdf} startIcon={<PictureAsPdfIcon />} style={{ color: 'blue', borderColor: 'blue' }}>
+          PDF
+        </Button>
       </div>
 
       {loading ? (
