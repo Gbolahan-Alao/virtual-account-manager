@@ -1,19 +1,19 @@
 
 .datepicker-wrapper {
     display: inline-block;
-    width: auto; /* Updated to automatically adjust width */
+    width: auto; 
   }
   
   .datepicker-input {
-    border: 1px solid blue; /* Updated to blue outline */
+    /* border: 1px solid rgb(143, 143, 216);  */
     border-radius: 8px;
     background-color: #f3f3f3;
-    padding: 8px 12px; /* Adjusted padding for height */
+    padding: 8px 12px; 
     font-size: 14px;
-    color: blue; /* Updated to blue text color */
+    color: #1d72f1; 
     width: auto;
     margin-right: 10px;
-    height: 40px; /* Adjusted height to match buttons */
+    height: 40px; 
   }
   
    

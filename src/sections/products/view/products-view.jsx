@@ -95,23 +95,32 @@ export default function TransactionsView() {
 
   const exportToPdf = () => {
     const doc = new JsPDF();
-
+  
     doc.text('Notifications', 10, 10);
-
+  
     let y = 20;
-    filteredNotificationsByDate.forEach((notification) => {
-      doc.text(`Transaction Date: ${formatDate(notification.transactionDate)}`, 10, y);
-      doc.text(`Account Number: ${notification.accountNumber}`, 10, y + 10);
-
-      y += 20;
+    const notificationsToExport = filteredNotificationsByDate.length > 0 ? filteredNotificationsByDate : notifications;
+    
+    notificationsToExport.forEach((notification, index) => {
+      doc.text(`Account Number:${notification.accountNumber}`, 10, y);
+      doc.text(`Transaction Date: ${formatDate(notification.transactionDate)}`, 20, y + 10);
+      doc.text(`Account Name: ${notification.virtualAccountName}`, 20, y + 30);
+      doc.text(`Amount: ${notification.amount}`, 20, y + 40);
+      doc.text(`Sender Account Number: ${notification.senderAccountNumber}`, 20, y + 50);
+      doc.text(`Sender Account Name: ${notification.senderAccountName}`, 20, y + 60);
+      doc.text(`Sender Bank Name: ${notification.senderBankName}`, 20, y + 70);
+      doc.text(`Transaction Reference: ${notification.transactionReference}`, 20, y + 80);
+  
+      y += 100; 
     });
-
+  
     doc.save('notifications.pdf');
   };
+  
 
   return (
     <Container>
-      <Typography variant="h4" component="h1" style={{ color: 'blue', marginBottom: 20 }}>
+      <Typography variant="h4" component="h1" style={{ color: '#1d72f1', marginBottom: 20 }}>
         Account Transactions
       </Typography>
 
@@ -120,15 +129,15 @@ export default function TransactionsView() {
           placeholder="Find transactions"
           value={searchQuery}
           onChange={handleSearchChange}
-          startAdornment={<SearchIcon />}
+          startAdornment={<SearchIcon style={{color:'#1d72f1'}}/>}
           style={{
             height: '40px',
             borderRadius: 8,
             backgroundColor: '#f3f3f3',
             padding: '6px 12px',
             marginRight: '16px',
-            color: 'blue',
-            border: '1px solid blue',
+            color: '#1d72f1',
+            // border: '1px solid blue',
           }}
         />
         <DatePicker
@@ -139,7 +148,7 @@ export default function TransactionsView() {
           placeholderText="Select date"
           wrapperClassName="datepicker-wrapper"
           className="datepicker-input"
-          customInput={<InputBase startAdornment={<EventIcon />} />}
+          customInput={<InputBase startAdornment={<EventIcon style={{color:'#1976d2'}}/>} />}
           style={{
             borderRadius: 8,
             backgroundColor: '#f3f3f3',
@@ -147,14 +156,14 @@ export default function TransactionsView() {
             paddingRight: '3px',
             height: '40px',
             width: '200px',
-            color: 'blue',
-            border: '1px solid blue',
+            // color: 'blue',
+            // border: '1px solid blue',
           }}
         />
-        <Button variant="outlined" onClick={exportToExcel} startIcon={<SaveAltIcon />} style={{ color: 'blue', borderColor: 'blue', marginRight: 10 }}>
+        <Button variant="outlined" onClick={exportToExcel} startIcon={<SaveAltIcon style={{}}/>} style={{color:'#1976d2',borderColor: '#f3f3f3',backgroundColor: '#f3f3f3', marginRight: 10 }}>
           Excel
         </Button>
-        <Button variant="outlined" onClick={exportToPdf} startIcon={<PictureAsPdfIcon />} style={{ color: 'blue', borderColor: 'blue' }}>
+        <Button variant="outlined" onClick={exportToPdf} startIcon={<PictureAsPdfIcon />} style={{color:'#1976d2',borderColor: '#f3f3f3',backgroundColor: '#f3f3f3', marginRight: 10 }}>
           PDF
         </Button>
       </div>

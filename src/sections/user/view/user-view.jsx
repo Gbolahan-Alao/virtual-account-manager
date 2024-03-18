@@ -67,16 +67,16 @@ const UserPage = () => {
   const handleChangeSearch = (e) => {
     const searchValue = e.target.value;
     setSearchWord(searchValue);
-    fetchAccounts(searchValue); 
+    fetchAccounts(searchValue);
   };
 
   useEffect(() => {
     fetchAccounts('');
-  }, [fetchAccounts]); 
+  }, [fetchAccounts]);
 
   useEffect(() => {
     fetchAccounts(searchWord);
-  }, [searchWord, fetchAccounts]); 
+  }, [searchWord, fetchAccounts]);
 
   const navigateToCreateAccount = () => {
     navigate('/create-account');
@@ -114,9 +114,9 @@ const UserPage = () => {
           marginBottom: '1rem',
         }}
       >
-        <Typography variant="h4" sx={{ alignSelf: 'flex-start', flexGrow: 1, marginTop: 0 }}>
-          Registered Accounts
-        </Typography>
+      <Typography variant="h4" sx={{ alignSelf: 'flex-start', flexGrow: 1, marginTop: 0, color: '#1d72f1' }}>
+      Registered Accounts
+     </Typography>
         <TextField
           label="Search"
           variant="outlined"
@@ -163,7 +163,7 @@ const UserPage = () => {
                       <TableCell>{account.branch}</TableCell>
                       <TableCell>{account.accountNumber}</TableCell>
                       <TableCell>{account.phoneNumber}</TableCell>
-                       <TableCell>{account.nickName}</TableCell>
+                      <TableCell>{account.nickName}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
